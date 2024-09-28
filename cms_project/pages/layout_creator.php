@@ -138,6 +138,24 @@
     <div id="debug-output"></div>
 
     <script src="../js/layout_creator.js"></script>
+    <script>
+    function saveLayout() {
+        var layoutName = document.getElementById('layoutName').value;
+        var layoutData = JSON.stringify(containers);
+        
+        $.ajax({
+            url: 'save_layout.php',
+            method: 'POST',
+            data: { name: layoutName, layout: layoutData },
+            success: function(response) {
+                alert('Layout saved successfully!');
+            },
+            error: function() {
+                alert('Error saving layout');
+            }
+        });
+    }
+    </script>
 </body>
 </html>
 

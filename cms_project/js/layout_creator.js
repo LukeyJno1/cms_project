@@ -436,4 +436,42 @@ $(document).ready(function() {
     function stopResizing() {
         isResizing = false;
         $(document).off('mousemove', resize);
-        $(document).off('mouseup', stopResizing
+        $(document).off('mouseup', stopResizing);
+        
+        if (currentElement) {
+            updateSizeDisplay(currentElement);
+            addToUndoStack();
+        }
+        
+        currentElement = null;
+    }
+
+    function updateSizeDisplay(element) {
+        const $element = $(element);
+        const width = $element.width();
+        const height = $element.height();
+        $element.find('.size-display').text(`${width}x${height}`);
+    }
+
+    function addResizeHandles(element) {
+        const directions = ['n', 'e', 's', 'w', 'ne', 'se', 'sw', 'nw'];
+        directions.forEach(dir => {
+            const handle = $('<div>').addClass(`resize-handle ${dir}`).attr('data-direction', dir);
+            $(element).append(handle);
+        });
+        
+        const sizeDisplay = $('<div>').addClass('size-display');
+        $(element).append(sizeDisplay);
+        updateSizeDisplay(element);
+    }
+
+    // Attach event listeners
+    $('#layout-preview').on('mousedown', '.layout-element', startDragging);
+    $(document).on('mousemove', drag);
+    $(document).on('mouseup', stopDragging);
+    $('#layout-preview').on('mousedown', '.resize-handle', startResizing);
+
+    // Initialize the layout creator
+    initializeResizablePreview();
+    updateBreakpointList();
+});
