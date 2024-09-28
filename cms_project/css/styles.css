@@ -1,0 +1,54 @@
+/* Basic styling */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #f4f4f4;
+}
+
+h2 {
+    color: #333;
+}
+
+form {
+    margin-bottom: 20px;
+}
+
+label {
+    display: inline-block;
+    width: 150px;
+}
+
+input[type="text"], input[type="password"], select {
+    padding: 5px;
+    margin-bottom: 10px;
+}
+
+button {
+    padding: 5px 10px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #218838;
+}
+
+hr {
+    margin: 20px 0;
+}
+
+#dbList {
+    margin-top: 10px;
+}
+
+#categoryList {
+    padding: 10px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+}
+#dbCreationForm {
+    display: block !important; /* Forcefully show the form for debugging */
+}

@@ -1,0 +1,124 @@
+#layout-creator {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+#controls {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+#layout-preview-container {
+    position: relative;
+    width: 60%;
+    overflow: hidden;
+}
+
+#layout-preview {
+    width: 100%;
+    min-height: 400px;
+    border: 1px solid #ccc;
+    padding: 10px;
+    box-sizing: border-box;
+    overflow: auto;
+}
+
+#preview-resizer {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 20px;
+    height: 20px;
+    background: #ccc;
+    cursor: se-resize;
+}
+
+#element-editor {
+    width: 35%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    margin-left: 10px;
+}
+
+.container {
+    border: 2px solid #333;
+    padding: 10px;
+    margin: 5px;
+    min-height: 50px;
+}
+
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    border: 1px dashed #999;
+    padding: 5px;
+    margin: 5px 0;
+    min-height: 30px;
+}
+
+.column {
+    flex: 1;
+    border: 1px dotted #666;
+    padding: 5px;
+    margin: 0 5px;
+    min-height: 30px;
+    min-width: 50px;
+}
+
+.container:before, .row:before, .column:before {
+    content: attr(data-name);
+    position: absolute;
+    top: -20px;
+    left: 0;
+    font-size: 12px;
+    color: #666;
+}
+
+#element-editor input, #element-editor select {
+    margin: 5px;
+    display: block;
+}
+
+.selected {
+    outline: 2px solid blue;
+}
+
+#css-output {
+    width: 100%;
+    margin-top: 20px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    white-space: pre-wrap;
+}
+
+#debug-output {
+    width: 100%;
+    margin-top: 20px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    background-color: #f0f0f0;
+}
+
+#responsive-previews {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.preview-container {
+    text-align: center;
+}
+
+.preview-container iframe {
+    border: 1px solid #ccc;
+}
+
+#breakpoint-editor {
+    margin-top: 20px;
+}
+
+#breakpoint-list input {
+    width: 60px;
+    margin-right: 10px;
+}
