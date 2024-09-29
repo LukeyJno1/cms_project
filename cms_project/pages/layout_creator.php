@@ -5,9 +5,9 @@ ini_set('display_errors', 1);
 
 // Database connection details
 $host = 'localhost';
-$dbname = 'your_database_name';
-$username = 'your_username';
-$password = 'your_password';
+$dbname = 'layout_creator_db';
+$username = 'root';
+$password = '';
 
 try {
     // Create a new PDO instance
