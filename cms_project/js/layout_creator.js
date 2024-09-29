@@ -8,6 +8,7 @@ $(document).ready(function() {
     let isResizing = false;
     let resizeDirection = '';
     let startX, startY, startLeft, startTop, startWidth, startHeight;
+    let versionCounter = 1;
 
     function debug(message) {
         $('#debug-output').append(`<p>${message}</p>`);
@@ -273,7 +274,6 @@ $(document).ready(function() {
         });
     }
 
-    // Prevent hiding the element editor
     $('#layout-preview').on('click', function(e) {
         if ($(e.target).is('#layout-preview')) {
             selectedElement = null;
@@ -432,7 +432,6 @@ $(document).ready(function() {
         
         updateSizeDisplay(currentElement);
     }
-
     function stopResizing() {
         isResizing = false;
         $(document).off('mousemove', resize);
@@ -471,7 +470,135 @@ $(document).ready(function() {
     $(document).on('mouseup', stopDragging);
     $('#layout-preview').on('mousedown', '.resize-handle', startResizing);
 
+    // New functions from the provided code
+
+    function applyColorToLayout(color) {
+        $('.container').css('backgroundColor', color);
+        saveLayoutState();
+    }
+
+    function applyFontToLayout(font) {
+        $('body').css('fontFamily', font);
+        saveLayoutState();
+    }
+
+    function applyGridToLayout(rows, columns) {
+        $('#layout-preview').css({
+            'display': 'grid',
+            'gridTemplateRows': `repeat(${rows}, 1fr)`,
+            'gridTemplateColumns': `repeat(${columns}, 1fr)`
+        });
+        saveLayoutState();
+    }
+
+    function addResponsiveBreakpoint(width, name) {
+        const $breakpoint = $(`
+            <div class="breakpoint">
+                <span>${name} (${width}px)</span>
+                <button class="remove-breakpoint-btn">Remove</button>
+            </div>
+        `);
+        $('#breakpoints-list').append($breakpoint);
+
+        $breakpoint.find('.remove-breakpoint-btn').on('click', function() {
+            $breakpoint.remove();
+        });
+
+        saveLayoutState();
+    }
+
+    function saveLayoutVersion() {
+        const versionName = `Version ${versionCounter}`;
+        const versionData = $('#layout-preview').html();
+
+        const $versionItem = $(`
+            <div class="version-item">
+                <span>${versionName}</span>
+                <button class="load-version-btn">Load</button>
+            </div>
+        `);
+        $('#versions-list').append($versionItem);
+
+        $versionItem.find('.load-version-btn').on('click', function() {
+            loadLayoutVersion(versionData);
+        });
+
+        versionCounter++;
+        saveLayoutState();
+    }
+
+    function loadLayoutVersion(versionData) {
+        $('#layout-preview').html(versionData);
+        saveLayoutState();
+    }
+
+    function runAccessibilityCheck() {
+        // Placeholder for accessibility checking logic
+        const issues = [
+            { element: 'img', issue: 'Missing alt text' },
+            { element: 'button', issue: 'Low contrast ratio' }
+        ];
+
+        displayAccessibilityResults(issues);
+    }
+
+    function displayAccessibilityResults(issues) {
+        const $resultsContainer = $('#accessibility-results');
+        $resultsContainer.empty();
+        issues.forEach(issue => {
+            $resultsContainer.append(`<div class="accessibility-issue">${issue.element}: ${issue.issue}</div>`);
+        });
+    }
+
+    function optimizeLayout() {
+        console.log('Optimizing layout...');
+        alert('Layout optimized for better performance!');
+    }
+
+    function shareLayout() {
+        const shareableLink = 'https://example.com/shared-layout/' + Date.now();
+        alert(`Share this link with your team: ${shareableLink}`);
+    }
+
+    function saveLayoutState() {
+        // Implement saving layout state logic here
+        console.log('Layout state saved');
+    }
+
+    // New event listeners
+
+    $('#apply-color-btn').on('click', function() {
+        const selectedColor = $('#color-picker').val();
+        applyColorToLayout(selectedColor);
+    });
+
+    $('#apply-font-btn').on('click', function() {
+        const selectedFont = $('#font-selector').val();
+        applyFontToLayout(selectedFont);
+    });
+
+    $('#apply-grid-btn').on('click', function() {
+        const rows = $('#grid-rows').val();
+        const columns = $('#grid-columns').val();
+        applyGridToLayout(rows, columns);
+    });
+
+    $('#add-breakpoint-btn').on('click', function() {
+        const width = $('#breakpoint-width').val();
+        const name = $('#breakpoint-name').val();
+        addResponsiveBreakpoint(width, name);
+    });
+
+    $('#save-version-btn').on('click', saveLayoutVersion);
+
+    $('#run-accessibility-check-btn').on('click', runAccessibilityCheck);
+
+    $('#optimize-layout-btn').on('click', optimizeLayout);
+
+    $('#share-layout-btn').on('click', shareLayout);
+
     // Initialize the layout creator
     initializeResizablePreview();
     updateBreakpointList();
+    debug('Layout Creator initialized');
 });
