@@ -1,162 +1,184 @@
-<?php include '../includes/header.php'; ?>
+<?php
+// Enable error reporting for debugging
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced CSS Layout Creator</title>
-    <link rel="stylesheet" href="../css/styles.css">
-    <link rel="stylesheet" href="../css/layout_creator.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-</head>
-<body>
-    <h1>Advanced CSS Layout Creator</h1>
-    <p><a href="layout_db_setup.php">Setup Database</a></p>
+// Database connection details
+$host = 'localhost';
+$dbname = 'your_database_name';
+$username = 'your_username';
+$password = 'your_password';
 
-    <div id="layout-creator">
-        <div id="controls">
-            <button id="add-container">Add Container</button>
-            <button id="add-row">Add Row</button>
-            <button id="add-column">Add Column</button>
-            <button id="undo">Undo</button>
-            <button id="delete-element"><i class="fas fa-trash"></i> Delete Element</button>
-            <button id="save-layout">Save Layout</button>
-            <button id="load-layout">Load Layout</button>
-            <button id="add-breakpoint">Add Breakpoint</button>
-        </div>
+try {
+    // Create a new PDO instance
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
+    
+    // Set the PDO error mode to exception
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-        <div id="layout-preview-container">
-            <div id="layout-preview"></div>
-            <div id="preview-resizer"></div>
-        </div>
-
-        <div id="element-editor">
-            <h3>Edit Element: <span id="element-name"></span></h3>
-            <label for="element-custom-name">Custom Name:</label>
-            <input type="text" id="element-custom-name" placeholder="Custom Name">
-            
-            <label for="width">Width:</label>
-            <input type="text" id="width" placeholder="Width">
-            <select id="width-unit">
-                <option value="px">px</option>
-                <option value="%">%</option>
-                <option value="auto">auto</option>
-            </select>
-            
-            <label for="height">Height:</label>
-            <input type="text" id="height" placeholder="Height">
-            <select id="height-unit">
-                <option value="px">px</option>
-                <option value="%">%</option>
-                <option value="auto">auto</option>
-            </select>
-            
-            <label for="padding">Padding:</label>
-            <input type="text" id="padding" placeholder="Padding">
-            
-            <label for="margin">Margin:</label>
-            <input type="text" id="margin" placeholder="Margin">
-            
-            <label for="border-width">Border Width:</label>
-            <input type="text" id="border-width" placeholder="Border Width">
-            
-            <label for="border-style">Border Style:</label>
-            <select id="border-style">
-                <option value="none">None</option>
-                <option value="solid">Solid</option>
-                <option value="dashed">Dashed</option>
-                <option value="dotted">Dotted</option>
-            </select>
-            
-            <label for="border-color">Border Color:</label>
-            <input type="color" id="border-color">
-            
-            <label for="bg-color">Background Color:</label>
-            <input type="color" id="bg-color" title="Background Color">
-            
-            <label for="bg-gradient">Background Gradient:</label>
-            <input type="text" id="bg-gradient" placeholder="e.g., linear-gradient(to right, #ff0000, #00ff00)">
-            
-            <label for="bg-image">Background Image URL:</label>
-            <input type="text" id="bg-image" placeholder="Background Image URL">
-            
-            <label for="bg-repeat">Background Repeat:</label>
-            <select id="bg-repeat">
-                <option value="repeat">Repeat</option>
-                <option value="no-repeat">No Repeat</option>
-                <option value="repeat-x">Repeat X</option>
-                <option value="repeat-y">Repeat Y</option>
-            </select>
-            
-            <label for="horizontal-align">Horizontal Alignment:</label>
-            <select id="horizontal-align">
-                <option value="">Default</option>
-                <option value="left">Left</option>
-                <option value="center">Center</option>
-                <option value="right">Right</option>
-            </select>
-            
-            <label for="vertical-align">Vertical Alignment:</label>
-            <select id="vertical-align">
-                <option value="">Default</option>
-                <option value="top">Top</option>
-                <option value="middle">Middle</option>
-                <option value="bottom">Bottom</option>
-            </select>
-            
-            <label for="border-radius">Border Radius:</label>
-            <input type="text" id="border-radius" placeholder="Border Radius">
-            
-            <button id="apply-styles">Apply Styles</button>
-
-            <div id="breakpoint-editor">
-                <h4>Breakpoints</h4>
-                <div id="breakpoint-list"></div>
-            </div>
-        </div>
-    </div>
-
-    <div id="responsive-previews">
-        <h3>Responsive Previews</h3>
-        <div class="preview-container" id="mobile-preview">
-            <h4>Mobile (320px)</h4>
-            <iframe src="preview.php" width="320" height="480"></iframe>
-        </div>
-        <div class="preview-container" id="tablet-preview">
-            <h4>Tablet (768px)</h4>
-            <iframe src="preview.php" width="768" height="1024"></iframe>
-        </div>
-        <div class="preview-container" id="desktop-preview">
-            <h4>Desktop (1024px)</h4>
-            <iframe src="preview.php" width="1024" height="768"></iframe>
-        </div>
-    </div>
-
-    <div id="css-output"></div>
-    <div id="debug-output"></div>
-
-    <script src="../js/layout_creator.js"></script>
-    <script>
-    function saveLayout() {
-        var layoutName = document.getElementById('layoutName').value;
-        var layoutData = JSON.stringify(containers);
+    // Check if the request method is POST
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        // Get the raw POST data
+        $json = file_get_contents('php://input');
         
-        $.ajax({
-            url: 'save_layout.php',
-            method: 'POST',
-            data: { name: layoutName, layout: layoutData },
-            success: function(response) {
-                alert('Layout saved successfully!');
-            },
-            error: function() {
-                alert('Error saving layout');
-            }
-        });
-    }
-    </script>
-</body>
-</html>
+        // Decode the JSON data
+        $layout = json_decode($json, true);
 
-<?php include '../includes/footer.php'; ?>
+        if ($layout === null && json_last_error() !== JSON_ERROR_NONE) {
+            throw new Exception('Invalid JSON data');
+        }
+
+        // Start a transaction
+        $pdo->beginTransaction();
+
+        // Clear existing layout data
+        $pdo->exec("DELETE FROM containers");
+        $pdo->exec("DELETE FROM columns");
+
+        // Prepare the SQL statement for inserting containers
+        $containerStmt = $pdo->prepare("INSERT INTO containers (id, custom_styles) VALUES (:id, :custom_styles)");
+
+        // Prepare the SQL statement for inserting columns
+        $columnStmt = $pdo->prepare("INSERT INTO columns (container_id, id, content, custom_styles) VALUES (:container_id, :id, :content, :custom_styles)");
+
+        foreach ($layout as $container) {
+            // Insert container
+            $containerStmt->execute([
+                'id' => $container['id'],
+                'custom_styles' => json_encode($container['custom_styles'] ?? [])
+            ]);
+            $containerId = $pdo->lastInsertId();
+
+            foreach ($container['columns'] as $column) {
+                // Insert column
+                $columnStmt->execute([
+                    'container_id' => $containerId,
+                    'id' => $column['id'],
+                    'content' => $column['content'],
+                    'custom_styles' => json_encode($column['custom_styles'] ?? [])
+                ]);
+            }
+        }
+
+        // Commit the transaction
+        $pdo->commit();
+
+        // Send a success response
+        header('Content-Type: application/json');
+        echo json_encode(['success' => true, 'message' => 'Layout saved successfully']);
+    } else {
+        // If the request method is not POST, display the HTML form
+        ?>
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Layout Creator</title>
+            <link rel="stylesheet" href="styles.css">
+        </head>
+        <body>
+            <h1>Layout Creator</h1>
+            <div id="toolbar">
+                <button id="add-container-btn">Add Container</button>
+                <button id="save-layout-btn">Save Layout</button>
+                <button id="preview-btn">Preview</button>
+                <button id="undo-btn">Undo</button>
+                <button id="redo-btn">Redo</button>
+                <button id="export-btn">Export</button>
+                <button id="import-btn">Import</button>
+                <input type="file" id="import-input" style="display: none;">
+            </div>
+            <div id="layout-container"></div>
+            <div id="responsive-tools">
+                <button id="responsive-preview-btn">Responsive Preview</button>
+                <select id="device-selector">
+                    <option value="desktop">Desktop</option>
+                    <option value="tablet">Tablet</option>
+                    <option value="mobile">Mobile</option>
+                </select>
+            </div>
+            <div id="custom-css-tools">
+                <button id="custom-css-btn">Custom CSS</button>
+            </div>
+            <div id="template-tools">
+                <select id="template-select">
+                    <option value="template1">Template 1</option>
+                    <option value="template2">Template 2</option>
+                </select>
+                <button id="apply-template-btn">Apply Template</button>
+            </div>
+            <div id="color-tools">
+                <input type="color" id="color-picker">
+                <button id="apply-color-btn">Apply Color</button>
+            </div>
+            <div id="font-tools">
+                <select id="font-selector">
+                    <option value="Arial">Arial</option>
+                    <option value="Helvetica">Helvetica</option>
+                    <option value="Times New Roman">Times New Roman</option>
+                </select>
+                <button id="apply-font-btn">Apply Font</button>
+            </div>
+            <div id="grid-tools">
+                <input type="number" id="grid-rows" placeholder="Rows">
+                <input type="number" id="grid-columns" placeholder="Columns">
+                <button id="apply-grid-btn">Apply Grid</button>
+            </div>
+            <div id="breakpoint-tools">
+                <input type="number" id="breakpoint-width" placeholder="Width">
+                <input type="text" id="breakpoint-name" placeholder="Name">
+                <button id="add-breakpoint-btn">Add Breakpoint</button>
+                <div id="breakpoints-list"></div>
+            </div>
+            <div id="versioning-tools">
+                <button id="save-version-btn">Save Version</button>
+                <div id="versions-list"></div>
+            </div>
+            <div id="accessibility-tools">
+                <button id="run-accessibility-check-btn">Run Accessibility Check</button>
+                <div id="accessibility-results"></div>
+            </div>
+            <div id="optimization-tools">
+                <button id="optimize-layout-btn">Optimize Layout</button>
+            </div>
+            <div id="collaboration-tools">
+                <button id="share-layout-btn">Share Layout</button>
+            </div>
+
+            <!-- Modals -->
+            <div id="preview-modal" class="modal">
+                <div class="modal-content">
+                    <span id="close-preview-btn" class="close">&times;</span>
+                    <div id="preview-content"></div>
+                </div>
+            </div>
+            <div id="responsive-preview-modal" class="modal">
+                <div class="modal-content">
+                    <span id="close-responsive-preview-btn" class="close">&times;</span>
+                    <div id="responsive-preview-content"></div>
+                </div>
+            </div>
+            <div id="custom-css-modal" class="modal">
+                <div class="modal-content">
+                    <span id="close-custom-css-btn" class="close">&times;</span>
+                    <textarea id="custom-css-textarea"></textarea>
+                    <button id="apply-custom-css-btn">Apply Custom CSS</button>
+                </div>
+            </div>
+
+            <script src="layout_creator.js"></script>
+        </body>
+        </html>
+        <?php
+    }
+} catch (Exception $e) {
+    // Rollback the transaction if an error occurred
+    if (isset($pdo)) {
+        $pdo->rollBack();
+    }
+
+    // Send an error response
+    header('Content-Type: application/json');
+    echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+}
